@@ -11,5 +11,8 @@
     "url": "git+https://github.com/gt-asin/fragments.git"
   },
   "author": "Anthony Sin",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "3.4.2"
+  }
 }
