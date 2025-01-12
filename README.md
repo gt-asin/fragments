@@ -1,6 +1,4 @@
 # fragments
-introduction to cloud computing
-
 ```
 npm run [script name]
 ```
@@ -17,7 +15,7 @@ To run any script that you have installed with your project, we need to use the 
 ```
 npm run start
 ```
-This runs the project on a local server which is usually localhost:8080. A shorter form of just writing node server.js 
+A command that condenses ```node [file locationl/server.js``` into a shorter command. This runs the project locally on your machine, which can be accessed at ```localhost:8080``` if it runs correctly. 
 ```
 npm run lint
 ```
