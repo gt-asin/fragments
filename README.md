@@ -15,16 +15,16 @@ To run any script that you have installed with your project, we need to use the 
 ```
 npm run start
 ```
-A command that condenses ```node [file locationl/server.js``` into a shorter command. This runs the project locally on your machine, which can be accessed at ```localhost:8080``` if it runs correctly. 
+A script that condenses the command ```node [file location]/server.js``` into a shorter command. Initially it runs the project locally on your machine, which can be accessed at ```localhost:8080``` if it runs correctly. 
 ```
 npm run lint
 ```
-A script that does not run the server, but checks for any errors or warnings that the server may produce and then displays them in the terminal.
+A script that does not run the server, but checks for any errors or warnings that the server may produce and then displays the errors or warnings in more helpful and detail in the terminal.
 ```
 npm run dev
 ```
-Runs the server in developer mode which allows you to monitor changes in real time of the server.js file. For example if you add a console.log while the server is still running, the changes will happen immediantly which is useful for testing portions of code on a live server.
+Runs the server in developer mode which allows you to monitor changes to the code in real time of the server.js file. For example if you add a console.log while the server is still running, the changes will happen immediantly which is useful for testing portions of code on a live server.
 ```
 npm run debug
 ```
-Does the same thing as dev script but attaches a debugger. This allows tools such as the VScode, or Chrome for debugging.
+Does the same thing as dev script but attaches a debugger so tools like VSCode and Chrome can listen in.
