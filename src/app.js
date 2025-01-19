@@ -4,8 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-
+const passport = require('passport');
+const authenticate = require('./auth');
 const logger = require('./logger');
+
 const pino = require('pino-http')({
   // Use our default logger instance, which is already configured
   logger,
@@ -27,6 +29,10 @@ app.use(cors());
 app.use(compression());
 
 // modifications to src/app.js
+
+// Set up our passport authentication middleware
+passport.use(authenticate.strategy());
+app.use(passport.initialize());
 
 // Remove `app.get('/', (req, res) => {...});` and replace with:
 
