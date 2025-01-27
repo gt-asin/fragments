@@ -5,6 +5,7 @@ const express = require('express');
 const { authenticate } = require('../../auth/basic-auth');
 // version and author from package.json
 const { version, author } = require('../../package.json');
+const { createSuccessResponse } = require('../response');
 
 // Create a router that we can use to mount our API
 const router = express.Router();
@@ -22,14 +23,15 @@ router.use(`/v1`, authenticate(), require('./api'));
 router.get('/', (req, res) => {
   // Client's shouldn't cache this response (always request it fresh)
   res.setHeader('Cache-Control', 'no-cache');
-  // Send a 200 'OK' response
-  res.status(200).json({
+  const response = createSuccessResponse({
     status: 'ok',
     author,
     // Use your own GitHub URL for this!
     githubUrl: 'https://github.com/gt-asin/fragments',
     version,
   });
+  // Send a 200 'OK' response
+  res.status(200).json(response);
 });
 
 module.exports = router;
