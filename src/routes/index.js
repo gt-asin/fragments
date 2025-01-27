@@ -2,7 +2,7 @@
 
 const express = require('express');
 
-const { authenticate } = require('../auth');
+const { authenticate } = require('../../auth/basic-auth');
 // version and author from package.json
 const { version, author } = require('../../package.json');
 
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
     status: 'ok',
     author,
     // Use your own GitHub URL for this!
-    githubUrl: 'https://github.com/REPLACE_WITH_YOUR_GITHUB_USERNAME/fragments',
+    githubUrl: 'https://github.com/gt-asin/fragments',
     version,
   });
 });
