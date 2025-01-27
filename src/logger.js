@@ -1,5 +1,7 @@
 // src/logger.js
 
+const pino = require('pino');
+
 // Use `info` as our standard log level if not specified
 const options = { level: process.env.LOG_LEVEL || 'info' };
 
@@ -12,7 +14,9 @@ if (options.level === 'debug') {
       colorize: true,
     },
   };
-  console.log(process.env);
+  const logger = pino(options);
+
+  logger.info(process.env);
 }
 
 // Create and export a Pino Logger instance:
