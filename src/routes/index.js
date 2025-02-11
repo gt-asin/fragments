@@ -2,14 +2,13 @@
 
 const express = require('express');
 
-const { authenticate } = require('../../auth/basic-auth');
 // version and author from package.json
 const { version, author } = require('../../package.json');
 const { createSuccessResponse } = require('../response');
 
 // Create a router that we can use to mount our API
 const router = express.Router();
-
+const { authenticate } = require('../auth');
 /**
  * Expose all of our API routes on /v1/* to include an API version.
  */
