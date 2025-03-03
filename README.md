@@ -40,23 +40,23 @@ npm run debug
 
 Does the same thing as dev script but attaches a debugger so tools like VSCode and Chrome can listen in.
 
-``
+```
 docker build -t fragments:latest .
 
 ```
-# Build image
+
+Build image
 
 ```
-
 docker run --rm --name fragments --env-file env.jest -e LOG_LEVEL=debug -p 8080:8080 -d fragments:latest
 
 ```
+
 Run image in background. Left Port = host, Right Port = container
 
 ```
-
 docker logs -f <id>
 
 ```
-# Real time logs for container
-```
+
+Real time logs for container
