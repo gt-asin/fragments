@@ -43,7 +43,7 @@ WORKDIR /app
 COPY --from=build /app /app
 
 # Installs curl because alpine does not have it by default
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl=8.12.1-r0
 
 # Start the container by running our server
 CMD ["npm", "start"]
