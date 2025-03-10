@@ -5,7 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const passport = require('passport');
-const authenticate = require('../auth/basic-auth');
+const authenticate = require('./auth/basic-auth');
 const { createErrorResponse } = require('./response');
 const logger = require('./logger');
 
