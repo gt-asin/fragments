@@ -5,9 +5,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const passport = require('passport');
-const authenticate = require('./auth/basic-auth');
+const authenticate = require('./auth');
 const { createErrorResponse } = require('./response');
 const logger = require('./logger');
+
+if (!process.env.API_URL) {
+  logger.warn('Missing ENV variable: API_URL');
+  throw new Error('Missing ENV variable: API_URL');
+}
 
 const pino = require('pino-http')({
   // Use our default logger instance, which is already configured

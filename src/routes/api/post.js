@@ -6,11 +6,6 @@ module.exports = async (req, res) => {
   const reqBody = req.body;
   logger.debug({ reqBody }, 'POST /fragments request');
 
-  if (!process.env.API_URL) {
-    logger.warn('Missing ENV variable: API_URL');
-    throw new Error('Missing ENV variable: API_URL');
-  }
-
   if (!Buffer.isBuffer(req.body)) {
     logger.warn('Incorrect or missing buffer data');
     return res.status(415).json(createErrorResponse(415, 'Incorrect or missing buffer data'));
@@ -21,8 +16,8 @@ module.exports = async (req, res) => {
       ownerId: req.user,
       type: req.get('Content-Type'),
     });
-    await fragment.save();
     await fragment.setData(req.body);
+    await fragment.save();
     logger.info({ fragment }, 'Successfully created a new fragment');
 
     res.set({

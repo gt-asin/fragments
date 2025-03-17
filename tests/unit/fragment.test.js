@@ -196,6 +196,11 @@ describe('Fragment class', () => {
       expect(Date.parse(fragment2.updated)).toBeGreaterThan(Date.parse(modified1));
     });
 
+    test('byUser() returns fragments for user', async () => {
+      const result = await Fragment.byUser('user1');
+      expect(result).toEqual([]);
+    });
+
     test('setData() updates the updated date/time of a fragment', async () => {
       const data = Buffer.from('hello');
       const ownerId = '7777';
@@ -252,6 +257,23 @@ describe('Fragment class', () => {
 
       await Fragment.delete('1234', fragment.id);
       expect(() => Fragment.byId('1234', fragment.id)).rejects.toThrow();
+    });
+
+    describe('formats()', () => {
+      test('returns correct formats for different fragment types', () => {
+        const textFragment = new Fragment({ ownerId: 'user1', type: 'text/plain', size: 10 });
+        expect(textFragment.formats).toEqual(['text/plain']);
+
+        const markdownFragment = new Fragment({
+          ownerId: 'user1',
+          type: 'text/markdown',
+          size: 10,
+        });
+        expect(markdownFragment.formats).toEqual(['text/markdown', 'text/html', 'text/plain']);
+
+        const jsonFragment = new Fragment({ ownerId: 'user1', type: 'application/json', size: 10 });
+        expect(jsonFragment.formats).toEqual(['application/json', 'text/plain']);
+      });
     });
   });
 });
