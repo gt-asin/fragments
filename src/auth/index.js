@@ -1,4 +1,3 @@
-const logger = require('../logger');
 // src/auth/index.js
 // Make sure our env isn't configured for both AWS Cognito and HTTP Basic Auth.
 // We can only do one or the other.  If your .env file contains all 3 of these
@@ -16,12 +15,10 @@ if (
 
 // Prefer Amazon Cognito (production)
 if (process.env.AWS_COGNITO_POOL_ID && process.env.AWS_COGNITO_CLIENT_ID) {
-  logger.info('Using ./cognito');
   module.exports = require('./cognito');
 }
 // Also allow for an .htpasswd file to be used, but not in production
 else if (process.env.HTPASSWD_FILE && process.env.NODE_ENV !== 'production') {
-  logger.info('Using ./basic-auth');
   module.exports = require('./basic-auth');
 }
 // In all other cases, we need to stop now and fix our config
