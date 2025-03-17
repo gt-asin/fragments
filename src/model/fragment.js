@@ -29,12 +29,12 @@ class Fragment {
       if (size < 0) throw new Error('size cannot be negative');
     }
 
-    this.created = created || new Date().toISOString();
     this.id = id || randomUUID();
     this.ownerId = ownerId;
-    this.size = size;
-    this.type = type;
+    this.created = created || new Date().toISOString();
     this.updated = updated || new Date().toISOString();
+    this.type = type;
+    this.size = size;
   }
 
   /**
@@ -108,7 +108,7 @@ class Fragment {
     try {
       return readFragmentData(this.ownerId, this.id);
     } catch (err) {
-      logger.error(err, ' getData() failed to retrieve the buffer data');
+      logger.error({ err: err.message }, ' getData() failed to retrieve the buffer data');
       throw new Error(`Error: ${err}`);
     }
   }
@@ -128,8 +128,8 @@ class Fragment {
         return writeFragmentData(this.ownerId, this.id, data);
       }
     } catch (err) {
-      logger.error(err, ' setData() failed to overwrite the fragment');
-      throw new Error(`Error: ${err}`);
+      logger.error({ err: err.message }, ' setData() failed to overwrite the fragment');
+      throw new Error(`Error: ${err.message}`);
     }
   }
 
@@ -156,8 +156,20 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    if (this.mimeType == 'text/plain') return ['text/plain'];
-    else return null;
+    switch (this.mimeType) {
+      case 'text/plain':
+        return ['text/plain'];
+      case 'text/markdown':
+        return ['text/markdown', 'text/html', 'text/plain'];
+      case 'text/html':
+        return ['text/html', 'text/plain'];
+      case 'text/csv':
+        return ['text/csv', 'text/plain', 'application/json'];
+      case 'application/json':
+        return ['application/json', 'text/plain'];
+      default:
+        return null;
+    }
   }
 
   /**
@@ -166,7 +178,7 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    const validTypes = ['text/plain'];
+    const validTypes = ['text/plain', 'text/markdown', 'text/html', 'text/csv', 'application/json'];
 
     return validTypes.some((element) => value.includes(element));
   }
