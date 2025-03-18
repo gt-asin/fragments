@@ -4,10 +4,11 @@ const { createErrorResponse, createSuccessResponse } = require('../../response')
 
 module.exports = async (req, res) => {
   const idParam = req.params.id;
-  logger.debug({ idParam }, 'GET /fragments/:id/info');
+  logger.info('GET /fragments/:id/info request');
+
   try {
     const fragment = await Fragment.byId(req.user, idParam);
-    logger.info({ fragment }, 'Successfully retrieve an existing fragment based on the given id');
+    logger.debug({ fragment }, 'Successful fragment retrieval');
     res.status(200).json(
       createSuccessResponse({
         fragments: fragment,

@@ -2,87 +2,65 @@ const { createErrorResponse } = require('../../response');
 const logger = require('../../logger');
 const { Fragment } = require('../../model/fragment');
 const md = require('markdown-it')();
+const mimeTypes = require('mime-types');
 const { htmlToText } = require('html-to-text');
+const path = require('path');
 
-/**
- * Get a specific fragment with optional format conversion
- */
+// Get a specific fragment with optional format conversion
 module.exports = async (req, res) => {
   const ownerId = req.user;
-  const [id, extension] = req.params.id.split('.');
+  const url = req.params.id;
+  const id = path.basename(url, path.extname(url));
+  const extension = path.extname(url).slice(1);
 
-  logger.info({ id, ownerId, extension }, `Calling GET ${req.originalUrl}`);
+  logger.debug({ id, extension }, 'GET /fragments/:id');
 
   try {
     const fragment = await Fragment.byId(ownerId, id);
-    logger.debug({ fragment }, 'Fragment was found');
-
     const data = await fragment.getData();
-    logger.debug('Fragment data has been retrieved');
-
-    // if extension was included, attempt to convert data and then return it
+    logger.debug({ fragment }, 'Fragment and data was found');
+    // Attempt to convert if an extension is found on the fragment
     if (extension) {
-      const extensionType = getExtensionContentType(extension);
-      logger.info({ from: fragment.mimeType, to: extensionType }, 'Converting fragment');
-
-      if (fragment.formats.includes(extensionType)) {
+      // When an extension is found, match extension by type
+      const newContentType = mimeTypes.lookup(extension);
+      // Check to see if fragment type matches a valid conversion type before converting
+      if (fragment.formats.includes(newContentType)) {
         const convertedData = await convertData(data, fragment.mimeType, extension);
-
-        res.setHeader('Content-Type', extensionType);
+        logger.debug({ from: fragment.mimeType, to: newContentType }, 'Converting fragment type');
+        res.setHeader('Content-Type', newContentType);
         res.status(200).send(convertedData);
       } else {
-        const message = `a ${fragment.mimeType} fragment cannot be return as a ${extension}`;
-        const errorResponse = createErrorResponse(415, message);
-
-        logger.error({ errorResponse }, 'Invalid operation');
-        res.status(415).json(errorResponse);
+        logger.debug({ extension }, 'Invalid extension');
+        res.status(415).json(createErrorResponse(415, 'Invalid extension'));
       }
-    }
-    // otherwise return raw fragment data with its type
-    else {
+      // No extension was provided. Therefore just display the metadata
+    } else {
       res.setHeader('Content-Type', fragment.type);
       res.status(200).send(data);
     }
-  } catch (err) {
-    const errorResponse = createErrorResponse(404, err.message);
-    logger.warn({ id, errorResponse }, 'Failed to retrieve fragment');
-    res.status(404).json(err.message);
+  } catch (error) {
+    logger.warn({ id, error }, 'Failed to retrieve fragment');
+    res.status(404).json(createErrorResponse(404, error.message));
   }
 };
 
-const getExtensionContentType = (extension) => {
-  switch (extension) {
-    case 'txt':
-      return 'text/plain';
-    case 'md':
-      return 'text/markdown';
-    case 'html':
-      return 'text/html';
-    case 'json':
-      return 'application/json';
-    default:
-      return null;
-  }
-};
-
-// convert data
 const convertData = async (data, from, to) => {
-  let convertedData = data;
+  let convertedData = Buffer.from(data).toString();
 
   switch (from) {
     case 'text/markdown':
       if (to == 'txt') {
-        convertedData = md.render(data.toString());
+        convertedData = md.render(convertedData);
         convertedData = htmlToText(convertedData.toString(), { wordwrap: 150 });
       }
       if (to == 'html') {
-        convertedData = md.render(data.toString());
+        convertedData = md.render(convertedData);
       }
       break;
 
     case 'text/html':
       if (to == 'txt') {
-        convertedData = htmlToText(data.toString(), { wordwrap: 130 });
+        convertedData = htmlToText(convertedData, { wordwrap: 130 });
       }
       break;
 
@@ -92,7 +70,5 @@ const convertData = async (data, from, to) => {
       }
       break;
   }
-
-  logger.debug(`Fragment data was successfully converted from ${from} to ${to}`);
   return Promise.resolve(convertedData);
 };
