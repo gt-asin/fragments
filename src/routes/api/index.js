@@ -39,5 +39,6 @@ router.post('/fragments', rawBody(), require('./post'));
 router.get('/fragments/:id', require('./get-by-id'));
 // Retrieve and display data of fragment
 router.get('/fragments/:id/info', require('./get-by-id-info'));
+router.delete('/fragments/:id', require('./delete'));
 
 module.exports = router;

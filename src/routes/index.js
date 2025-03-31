@@ -15,6 +15,7 @@ const { authenticate } = require('../auth');
 
 router.use(`/v1`, authenticate(), require('./api'));
 
+const { hostname } = require('os');
 /**
  * Define a simple health check route. If the server is running
  * we'll respond with a 200 OK.  If not, the server isn't healthy.
@@ -28,6 +29,8 @@ router.get('/', (req, res) => {
     // Use your own GitHub URL for this!
     githubUrl: 'https://github.com/gt-asin/fragments',
     version,
+    // Include the hostname in the response
+    hostname: hostname(),
   });
   // Send a 200 'OK' response
   res.status(200).json(response);
