@@ -33,5 +33,5 @@ GET {{url}}
 [BasicAuth]
 user1@email.com:password1
 
-# GET Response
+# GET Response for
 HTTP/1.1 404

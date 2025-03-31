@@ -1,6 +1,6 @@
 // src/routes/api/get.js
+
 const { createSuccessResponse, createErrorResponse } = require('../../response');
-const { version, author } = require('../../../package.json');
 const logger = require('../../logger');
 const { Fragment } = require('../../model/fragment');
 
@@ -11,9 +11,6 @@ module.exports = async (req, res) => {
     const displayExpand = req.query.expand == 1 ? true : false;
     const fragments = await Fragment.byUser(req.user, displayExpand);
     const response = createSuccessResponse({
-      author,
-      githubUrl: 'https://github.com/gt-asin/fragments',
-      version,
       fragments,
     });
     logger.info('GET all fragments success');
