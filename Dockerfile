@@ -7,7 +7,7 @@ LABEL maintainer="Anthony Sin <asin@myseneca.ca>"
 LABEL description="Fragments node.js microservice"
 
 # We default to use port 8080 in our service, reduce npm spam, disable colour when running inside docker
-ENV PORT=8080 \
+ENV PORT=${PORT} \
   NPM_CONFIG_LOGLEVEL=warn \
   NPM_CONFIG_COLOR=false
 
