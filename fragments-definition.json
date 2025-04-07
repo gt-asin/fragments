@@ -1,9 +1,9 @@
 {
-  "taskDefinitionArn": "arn:aws:ecs:us-east-1:436233884413:task-definition/fragments-task:6",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:436233884413:task-definition/fragments-task:17",
   "containerDefinitions": [
     {
       "name": "fragments-container",
-      "image": "436233884413.dkr.ecr.us-east-1.amazonaws.com/fragments:v0.7.9",
+      "image": "436233884413.dkr.ecr.us-east-1.amazonaws.com/fragments:v0.10.6",
       "cpu": 0,
       "portMappings": [
         {
@@ -17,16 +17,20 @@
       "essential": true,
       "environment": [
         {
-          "name": "AWS_REGION",
-          "value": "us-east-1"
-        },
-        {
           "name": "AWS_COGNITO_POOL_ID",
           "value": "us-east-1_RbROTmNHY"
         },
         {
+          "name": "AWS_REGION",
+          "value": "us-east-1"
+        },
+        {
           "name": "API_URL",
           "value": "http://fragments-lb-700453494.us-east-1.elb.amazonaws.com"
+        },
+        {
+          "name": "PORT",
+          "value": "80"
         },
         {
           "name": "AWS_S3_BUCKET_NAME",
@@ -37,12 +41,16 @@
           "value": "production"
         },
         {
-          "name": "LOG_LEVEL",
-          "value": "debug"
+          "name": "AWS_DYNAMODB_TABLE_NAME",
+          "value": "fragments"
         },
         {
           "name": "AWS_COGNITO_CLIENT_ID",
           "value": "8kdc61rlb5ksrgskjra0n9l7k"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "debug"
         }
       ],
       "mountPoints": [],
@@ -56,7 +64,8 @@
           "max-buffer-size": "25m",
           "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
-        }
+        },
+        "secretOptions": []
       },
       "systemControls": []
     }
@@ -65,7 +74,7 @@
   "taskRoleArn": "arn:aws:iam::436233884413:role/LabRole",
   "executionRoleArn": "arn:aws:iam::436233884413:role/LabRole",
   "networkMode": "awsvpc",
-  "revision": 6,
+  "revision": 17,
   "volumes": [],
   "status": "ACTIVE",
   "requiresAttributes": [
@@ -109,7 +118,7 @@
     "cpuArchitecture": "X86_64",
     "operatingSystemFamily": "LINUX"
   },
-  "registeredAt": "2025-04-01T02:04:45.852Z",
+  "registeredAt": "2025-04-07T10:07:21.272Z",
   "registeredBy": "arn:aws:sts::436233884413:assumed-role/voclabs/user3769077=Sin,_Anthony",
   "enableFaultInjection": false,
   "tags": []
