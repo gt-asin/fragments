@@ -49,7 +49,7 @@ RUN apk --no-cache --update add curl=8.12.1-r1
 CMD ["node", "src/index.js"]
 
 # We run our service on port 8080
-EXPOSE $PORT
+EXPOSE ${PORT}
 
 # Health Check for server every 30 seconds
 HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=3 \
