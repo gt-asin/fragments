@@ -4,6 +4,8 @@ const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
 const { logger } = require('../logger');
+const { htmlToText } = require('html-to-text');
+const md = require('markdown-it')();
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -181,6 +183,35 @@ class Fragment {
     const validTypes = ['text/plain', 'text/markdown', 'text/html', 'text/csv', 'application/json'];
 
     return validTypes.some((element) => value.includes(element));
+  }
+
+  static async convertData(data, from, to) {
+    let convertedData = Buffer.from(data).toString();
+
+    switch (from) {
+      case 'text/markdown':
+        if (to == 'txt') {
+          convertedData = md.render(convertedData);
+          convertedData = htmlToText(convertedData.toString(), { wordwrap: 150 });
+        }
+        if (to == 'html') {
+          convertedData = md.render(convertedData);
+        }
+        break;
+
+      case 'text/html':
+        if (to == 'txt') {
+          convertedData = htmlToText(convertedData, { wordwrap: 130 });
+        }
+        break;
+
+      case 'application/json':
+        if (to == 'txt') {
+          convertedData = JSON.parse(data.toString());
+        }
+        break;
+    }
+    return Promise.resolve(convertedData);
   }
 }
 module.exports.Fragment = Fragment;

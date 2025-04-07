@@ -1,9 +1,7 @@
 const { createErrorResponse } = require('../../response');
 const logger = require('../../logger');
 const { Fragment } = require('../../model/fragment');
-const md = require('markdown-it')();
 const mimeTypes = require('mime-types');
-const { htmlToText } = require('html-to-text');
 const path = require('path');
 
 // Get a specific fragment with optional format conversion
@@ -25,7 +23,7 @@ module.exports = async (req, res) => {
       const newContentType = mimeTypes.lookup(extension);
       // Check to see if fragment type matches a valid conversion type before converting
       if (fragment.formats.includes(newContentType)) {
-        const convertedData = await convertData(data, fragment.mimeType, extension);
+        const convertedData = await Fragment.convertData(data, fragment.mimeType, extension);
         logger.debug({ from: fragment.mimeType, to: newContentType }, 'Converting fragment type');
         res.setHeader('Content-Type', newContentType);
         res.status(200).send(convertedData);
@@ -42,33 +40,4 @@ module.exports = async (req, res) => {
     logger.warn({ id, error }, 'Failed to retrieve fragment');
     res.status(404).json(createErrorResponse(404, error.message));
   }
-};
-
-const convertData = async (data, from, to) => {
-  let convertedData = Buffer.from(data).toString();
-
-  switch (from) {
-    case 'text/markdown':
-      if (to == 'txt') {
-        convertedData = md.render(convertedData);
-        convertedData = htmlToText(convertedData.toString(), { wordwrap: 150 });
-      }
-      if (to == 'html') {
-        convertedData = md.render(convertedData);
-      }
-      break;
-
-    case 'text/html':
-      if (to == 'txt') {
-        convertedData = htmlToText(convertedData, { wordwrap: 130 });
-      }
-      break;
-
-    case 'application/json':
-      if (to == 'txt') {
-        convertedData = JSON.parse(data.toString());
-      }
-      break;
-  }
-  return Promise.resolve(convertedData);
 };
