@@ -1,5 +1,3 @@
-// XXX: temporary use of memory-db until we add DynamoDB
-//const MemoryDB = require('../memory/memory-db');
 const s3Client = require('./s3Client');
 const ddbDocClient = require('./ddbDocClient');
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
@@ -7,8 +5,6 @@ const { PutCommand, GetCommand, QueryCommand, DeleteCommand } = require('@aws-sd
 const logger = require('../../../logger');
 
 // Create two in-memory databases: one for fragment metadata and the other for raw data
-//const data = new MemoryDB();
-//const metadata = new MemoryDB();
 
 // Writes a fragment to DynamoDB. Returns a Promise.
 function writeFragment(fragment) {
