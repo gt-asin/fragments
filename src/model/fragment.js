@@ -6,6 +6,9 @@ const contentType = require('content-type');
 const { logger } = require('../logger');
 const { htmlToText } = require('html-to-text');
 const md = require('markdown-it')();
+const yaml = require('js-yaml');
+const sharp = require('sharp');
+const Papa = require('papaparse');
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -168,7 +171,15 @@ class Fragment {
       case 'text/csv':
         return ['text/csv', 'text/plain', 'application/json'];
       case 'application/json':
-        return ['application/json', 'text/plain'];
+        return ['application/json', 'text/plain', 'application/yaml', 'application/x-yaml'];
+      case 'application/yaml':
+        return ['application/yaml', 'text/plain'];
+      case 'image/png':
+      case 'image/jpeg':
+      case 'image/webp':
+      case 'image/avif':
+      case 'image/gif':
+        return ['image/gif', 'image/png', 'image/jpeg', 'image/webp', 'image/avif'];
       default:
         return null;
     }
@@ -180,7 +191,20 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    const validTypes = ['text/plain', 'text/markdown', 'text/html', 'text/csv', 'application/json'];
+    const validTypes = [
+      'text/plain',
+      'text/markdown',
+      'text/html',
+      'text/csv',
+      'application/json',
+      'application/yaml',
+      'application/x-yaml',
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'image/gif',
+      'image/avif',
+    ];
 
     return validTypes.some((element) => value.includes(element));
   }
@@ -190,25 +214,50 @@ class Fragment {
 
     switch (from) {
       case 'text/markdown':
-        if (to == 'txt') {
-          convertedData = md.render(convertedData);
+        if (to === 'txt') {
+          convertedData = md.render(data.toString());
           convertedData = htmlToText(convertedData.toString(), { wordwrap: 150 });
-        }
-        if (to == 'html') {
-          convertedData = md.render(convertedData);
-        }
+        } else if (to === 'html') convertedData = md.render(convertedData);
         break;
-
       case 'text/html':
-        if (to == 'txt') {
-          convertedData = htmlToText(convertedData, { wordwrap: 130 });
+        if (to === 'txt') convertedData = htmlToText(convertedData, { wordwrap: 130 });
+        break;
+      case 'text/csv':
+        if (to === 'txt') convertedData = data.toString();
+        else if (to === 'json') {
+          const csvData = data.toString();
+          const parse = Papa.parse(csvData, {
+            header: true,
+            skipEmptyLines: true,
+            delimiter: ',',
+          });
+
+          if (parse.errors.length) {
+            throw new Error(`CSV parse error: ${parse.errors[0].message}`);
+          }
+
+          convertedData = JSON.stringify(parse.data, null, 2);
         }
         break;
-
       case 'application/json':
-        if (to == 'txt') {
-          convertedData = JSON.parse(data.toString());
+        if (to === 'txt') {
+          const json = JSON.parse(data.toString());
+          convertedData = JSON.stringify(json, null, 2);
+        } else if (to === 'application/yaml' || to === 'application/x-yaml') {
+          const json = JSON.parse(data.toString());
+          convertedData = yaml.dump(json);
         }
+        break;
+      case 'image/png':
+      case 'image/jpeg':
+      case 'image/webp':
+      case 'image/gif':
+      case 'image/avif':
+        if (to === 'png') convertedData = await sharp(data).png().toBuffer();
+        else if (to === 'jpg') convertedData = await sharp(data).jpeg().toBuffer();
+        else if (to === 'webp') convertedData = await sharp(data).jpeg().toBuffer();
+        else if (to === 'gif') convertedData = await sharp(data).gif().toBuffer();
+        else if (to === 'avif') convertedData = await sharp(data).avif().toBuffer();
         break;
     }
     return Promise.resolve(convertedData);

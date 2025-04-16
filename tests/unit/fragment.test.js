@@ -6,17 +6,16 @@ const wait = async (ms = 100) => new Promise((resolve) => setTimeout(resolve, ms
 
 const validTypes = [
   `text/plain`,
-  /*
-   Currently, only text/plain is supported. Others will be added later.
-
   `text/markdown`,
   `text/html`,
   `application/json`,
+  `application/yaml`,
+  `application/x-yaml`,
   `image/png`,
   `image/jpeg`,
   `image/webp`,
   `image/gif`,
-  */
+  `image/avif`,
 ];
 
 describe('Fragment class', () => {
@@ -69,9 +68,7 @@ describe('Fragment class', () => {
     });
 
     test('invalid types throw', () => {
-      expect(
-        () => new Fragment({ ownerId: '1234', type: 'application/msword', size: 1 })
-      ).toThrow();
+      expect(() => new Fragment({ ownerId: '1234', type: 'application/fake', size: 1 })).toThrow();
     });
 
     test('valid types can be set', () => {
@@ -124,8 +121,8 @@ describe('Fragment class', () => {
     });
 
     test('other types are not supported', () => {
-      expect(Fragment.isSupportedType('application/octet-stream')).toBe(false);
-      expect(Fragment.isSupportedType('application/msword')).toBe(false);
+      expect(Fragment.isSupportedType('application/test')).toBe(false);
+      expect(Fragment.isSupportedType('application/hello')).toBe(false);
       expect(Fragment.isSupportedType('audio/webm')).toBe(false);
       expect(Fragment.isSupportedType('video/ogg')).toBe(false);
     });
@@ -272,7 +269,12 @@ describe('Fragment class', () => {
         expect(markdownFragment.formats).toEqual(['text/markdown', 'text/html', 'text/plain']);
 
         const jsonFragment = new Fragment({ ownerId: 'user1', type: 'application/json', size: 10 });
-        expect(jsonFragment.formats).toEqual(['application/json', 'text/plain']);
+        expect(jsonFragment.formats).toEqual([
+          'application/json',
+          'text/plain',
+          'application/yaml',
+          'application/x-yaml',
+        ]);
       });
     });
   });

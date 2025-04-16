@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
   try {
     await Fragment.delete(ownerId, fragmentId);
 
-    logger.info(`Fragment was deleted`);
+    logger.debug({ fragmentId }, `Fragment was deleted`);
 
     const successResponse = createSuccessResponse({});
     return res.status(200).json(successResponse);
