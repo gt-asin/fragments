@@ -1,3 +1,4 @@
+//const { listFragments } = require('../../src/model/data/aws');
 const { Fragment } = require('../../src/model/fragment');
 
 // Wait for a certain number of ms (default 50). Feel free to change this value
@@ -8,6 +9,7 @@ const validTypes = [
   `text/plain`,
   `text/markdown`,
   `text/html`,
+  `text/csv`,
   `application/json`,
   `application/yaml`,
   `application/x-yaml`,
@@ -172,6 +174,12 @@ describe('Fragment class', () => {
       expect(await Fragment.byUser('1234')).toEqual([]);
     });
 
+    test('Query fragment that does not exist', async () => {
+      await expect(Fragment.byId('fakeuser', '123')).rejects.toThrow(
+        'Error: Fragment was not found'
+      );
+    });
+
     test('a fragment can be created and save() stores a fragment for the user', async () => {
       const data = Buffer.from('hello');
       const fragment = new Fragment({ ownerId: '1234', type: 'text/plain', size: 0 });
@@ -247,7 +255,7 @@ describe('Fragment class', () => {
       expect(size).toBe(2);
     });
 
-    test('a fragment can be deleted', async () => {
+    test('Delete a fragment', async () => {
       const fragment = new Fragment({ ownerId: '1234', type: 'text/plain', size: 0 });
       await fragment.save();
       await fragment.setData(Buffer.from('a'));
@@ -256,10 +264,16 @@ describe('Fragment class', () => {
       expect(() => Fragment.byId('1234', fragment.id)).rejects.toThrow();
     });
 
-    describe('formats()', () => {
-      test('returns correct formats for different fragment types', () => {
-        const textFragment = new Fragment({ ownerId: 'user1', type: 'text/plain', size: 10 });
-        expect(textFragment.formats).toEqual(['text/plain']);
+    describe('Conversion types', () => {
+      test('Unknown content type', () => {
+        expect(() => {
+          new Fragment({ ownerId: 'user1', type: 'application/fake', size: 10 });
+        }).toThrow('invalid types throw');
+      });
+
+      test('Check correct conversion types', () => {
+        const plainFragment = new Fragment({ ownerId: 'user1', type: 'text/plain', size: 10 });
+        expect(plainFragment.formats).toEqual(['text/plain']);
 
         const markdownFragment = new Fragment({
           ownerId: 'user1',
@@ -268,6 +282,12 @@ describe('Fragment class', () => {
         });
         expect(markdownFragment.formats).toEqual(['text/markdown', 'text/html', 'text/plain']);
 
+        const htmlFragment = new Fragment({ ownerId: 'user1', type: 'text/html', size: 10 });
+        expect(htmlFragment.formats).toEqual(['text/html', 'text/plain']);
+
+        const csvFragment = new Fragment({ ownerId: 'user1', type: 'text/csv', size: 10 });
+        expect(csvFragment.formats).toEqual(['text/csv', 'text/plain', 'application/json']);
+
         const jsonFragment = new Fragment({ ownerId: 'user1', type: 'application/json', size: 10 });
         expect(jsonFragment.formats).toEqual([
           'application/json',
@@ -275,6 +295,9 @@ describe('Fragment class', () => {
           'application/yaml',
           'application/x-yaml',
         ]);
+
+        const yamlFragment = new Fragment({ ownerId: 'user1', type: 'application/yaml', size: 10 });
+        expect(yamlFragment.formats).toEqual(['application/yaml', 'text/plain']);
       });
     });
   });

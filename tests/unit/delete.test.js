@@ -4,19 +4,17 @@ const request = require('supertest');
 const app = require('../../src/app');
 
 describe('DELETE /v1/fragments/:id', () => {
-  test('unauthenticated requests are denied', async () => {
-    const res = await request(app).delete('/v1/fragments/id');
+  test('Unauthenticated request', async () => {
+    const res = await request(app).delete('/v1/fragments/fakeid');
     expect(res.statusCode).toBe(401);
   });
 
   test('incorrect credentials are denied', async () => {
-    const res = await request(app)
-      .delete('/v1/fragments/id')
-      .auth('invalid@email.com', 'incorrect_password');
+    const res = await request(app).delete('/v1/fragments/id').auth('fake@123.com', '1234567');
     expect(res.statusCode).toBe(401);
   });
 
-  test('DELETE fragment with correct credentials', async () => {
+  test('Successful delete request', async () => {
     const post_response = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
@@ -33,9 +31,9 @@ describe('DELETE /v1/fragments/:id', () => {
     expect(res.body.status).toBe('ok');
   });
 
-  test('deleting a non-existent fragment should throw', async () => {
+  test('Deleting a fragment that doesnt exist', async () => {
     const res = await request(app)
-      .delete('/v1/fragments/non-existent')
+      .delete('/v1/fragments/fake')
       .auth('user1@email.com', 'password1');
 
     expect(res.status).toBe(404);
