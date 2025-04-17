@@ -3,7 +3,7 @@
 const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
-const { logger } = require('../logger');
+const logger = require('../logger');
 const { htmlToText } = require('html-to-text');
 const md = require('markdown-it')();
 const yaml = require('js-yaml');
@@ -53,7 +53,7 @@ class Fragment {
       return listFragments(ownerId, expand);
     } catch (err) {
       logger.error(err, ' byUser() failed to retrieve fragments for user');
-      throw new Error(`Error: ${err}`);
+      throw new Error(err);
     }
   }
 
@@ -72,7 +72,7 @@ class Fragment {
       return fragment instanceof Fragment ? fragment : new Fragment(fragment);
     } catch (err) {
       logger.error(err, ' byId() failed to retrieve the fragment by ID');
-      throw new Error(`Error: ${err}`);
+      throw new Error(err);
     }
   }
 
@@ -87,7 +87,7 @@ class Fragment {
       await deleteFragment(ownerId, id);
     } catch (err) {
       logger.error(err, ' delete() failed to delete a fragment');
-      throw new Error(`Error: ${err}`);
+      throw new Error(err);
     }
   }
 
@@ -101,7 +101,7 @@ class Fragment {
       await writeFragment(this);
     } catch (err) {
       logger.error(err, ' save() failed to update the fragment');
-      throw new Error(`Error: ${err.message}`);
+      throw new Error(err);
     }
   }
 
@@ -134,7 +134,7 @@ class Fragment {
       }
     } catch (err) {
       logger.error({ err: err.message }, ' setData() failed to overwrite the fragment');
-      throw new Error(`Error: ${err.message}`);
+      throw new Error(err);
     }
   }
 
